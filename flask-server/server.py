@@ -84,8 +84,8 @@ def get_annotations(video_id):
 def run_inference():
     content = request.json
     video_name = content.get("video_name")
-    model_path = "C:/Users/ridas/WebstormProjects/ReactFlask/flask-server/videomae_temporal_detector_Big1.pth"
-    pickle_path = "C:/Users/ridas/WebstormProjects/ReactFlask/flask-server/mini.pkl"
+    model_path = "C:/Users/ridas/Desktop/TAD/flask-server/videomae_temporal_detector_Big1.pth"
+    pickle_path = "C:/Users/ridas/Desktop/TAD/flask-server/mini.pkl"
 
     if not all([video_name, model_path, pickle_path]):
         return jsonify({"error": "Missing required fields: video_name, model_path, pickle_path"}), 400
