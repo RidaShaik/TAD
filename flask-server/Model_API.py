@@ -4,6 +4,8 @@ from transformers import VideoMAEModel, VideoMAEConfig, Trainer, TrainingArgumen
 from torch import nn
 import torch
 import pickle
+import subprocess # EDITED HERE
+import os # EDITED HERE
 from sklearn.metrics import f1_score
 
 IMG_MEAN = [0.485, 0.456, 0.406]
@@ -94,8 +96,12 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
     fps = cap.get(cv2.CAP_PROP_FPS)
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    new_w = w // 2 # EDITED HERE
+    new_h = h // 2 # EDITED HERE
+
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
+    out = cv2.VideoWriter(output_path, fourcc, fps, (new_w, new_h)) # EDITED HERE
 
     frame_idx = 0
     bg_index = class_names.index("background") if "background" in class_names else None
@@ -104,6 +110,8 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
         ret, frame = cap.read()
         if not ret or frame_idx >= len(pred_binary):
             break
+
+        frame = cv2.resize(frame, (new_w, new_h)) # EDITED HERE
 
         scores = pred_scores[frame_idx]  # shape: (C,)
         active = pred_binary[frame_idx]  # shape: (C,)
@@ -130,7 +138,22 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
 
     cap.release()
     out.release()
+
     print(f" Saved annotated video to {output_path}")
+
+    print(f" Saved raw annotated video to {output_path}")
+
+    try: # EDIT HERE START
+        fixed_output = output_path.replace('.mp4', '_fixed.mp4')
+        subprocess.run([
+            'ffmpeg', '-y', '-i', output_path,
+            '-vcodec', 'libx264', '-crf', '23',
+            fixed_output
+        ], check=True)
+        os.replace(fixed_output, output_path)
+        print(f"Re-encoded {output_path} successfully.")
+    except Exception as e:
+        print(f"ffmpeg compression failed: {e}") # EDIT HERE END
 
 def find_best_thresholds_per_class(pred_scores, true_labels, thresholds=np.linspace(0.01, 0.99, 50), verbose=True, class_names=None):
     num_classes = pred_scores.shape[1]

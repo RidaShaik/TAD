@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_file # EDIT HERE
 from flask import jsonify
 from flask import request
 from flask import send_from_directory
@@ -44,7 +44,9 @@ def list_videos():
 
 @app.route("/videos/<filename>", methods=['GET'])
 def get_video(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    #return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    video_path = os.path.join(app.config['UPLOAD_FOLDER'], filename) # EDIT HERE
+    return send_file(video_path, mimetype='video/mp4') # EDIT HERE
 
 def load_annotations():
     if not os.path.exists(ANNOTATIONS_FILE):
