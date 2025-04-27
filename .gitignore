@@ -1,0 +1,4 @@
+training/
+flask-server/uploads/
+flask-server/videomae_temporal_detector_Big1.pth
+flask-server/videomae_temporal_detector_small.pth

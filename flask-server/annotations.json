@@ -1,0 +1,23 @@
+{
+    "video_id": "basketball_game_001",
+    "frame_rate": 30,
+    "resolution": [1280, 720],
+    "annotations": [
+        {
+            "action": "Dunk",
+            "start_time": 12.5,
+            "end_time": 13.2,
+            "start_frame": 375,
+            "end_frame": 396,
+            "confidence": 0.95
+        },
+        {
+            "action": "3-Point Shot",
+            "start_time": 45.1,
+            "end_time": 46.3,
+            "start_frame": 1353,
+            "end_frame": 1389,
+            "confidence": 0.89
+        }
+    ]
+}

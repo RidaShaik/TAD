@@ -1,0 +1,10 @@
+datasets
+torch 
+torchvision 
+torchaudio 
+transformers 
+einops 
+opencv-python 
+tqdm
+python-dotenv
+
