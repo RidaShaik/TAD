@@ -342,14 +342,6 @@ body {
   transform: scale(1.01);
 }
 
-.annotation-box {
-  position: "relative";
-  top: "10px";
-  right: "10px";
-  color: "white";
-  padding: "5px";
-}
-
 .begin-button {
   padding: 12px 30px;
   font-size: 1.2rem;
@@ -365,4 +357,29 @@ body {
 .begin-button:hover {
   background-color: #2f446f;
   transform: scale(1.05);
+}
+
+.annotation-box {
+  margin-top: 10px;
+}
+
+.current-annotation {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.annotation-history {
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border-radius: 5px;
+  color: white;
+}
+
+.history-entry {
+  font-size: 0.9em;
+  margin-bottom: 5px;
 }

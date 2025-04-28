@@ -16,23 +16,53 @@ function App() {
       }
 };*/
 
-    const handleTimeUpdate = () => {
+    /*const handleTimeUpdate = () => {
         if (videoRef.current) {
             const currentTime = videoRef.current.currentTime;
-            const fps = 30; // If your videos are 30 FPS; adjust if needed
+            const fps = 30;
             const frameIndex = Math.floor(currentTime * fps);
 
             if (frameIndex >= 0 && frameIndex < frameAnnotations.length) {
                 const labels = frameAnnotations[frameIndex];
 
                 if (labels && labels.length > 0) {
-                    const timestamp = currentTime.toFixed(1); // example: "3.4"
+                    const timestamp = currentTime.toFixed(1);
                     const labelText = labels.join(", ");
                     setCurrentAnnotation(`Time: ${timestamp}s\nLabels: ${labelText}`);
                 } else {
                     const timestamp = currentTime.toFixed(1);
                     setCurrentAnnotation(`Time: ${timestamp}s\n(No action detected)`);
                 }
+            } else {
+                setCurrentAnnotation("(Waiting for video to start...)");
+            }
+        }
+    };*/
+
+    const handleTimeUpdate = () => {
+        if (videoRef.current) {
+            const currentTime = videoRef.current.currentTime;
+            const fps = 30;
+            const frameIndex = Math.floor(currentTime * fps);
+
+            if (frameIndex >= 0 && frameIndex < frameAnnotations.length) {
+                const labels = frameAnnotations[frameIndex];
+
+                const timestamp = currentTime.toFixed(1);
+                const labelText = labels && labels.length > 0
+                  ? labels.join(", ")
+                  : "(No action detected)";
+
+                const annotationText = `Time: ${timestamp}s | Labels: ${labelText}`;
+                setCurrentAnnotation(annotationText);
+
+                setAnnotationsHistory(prevHistory => {
+                    const newHistory = [...prevHistory];
+                    if (newHistory.length === 0 || newHistory[newHistory.length - 1] !== annotationText) {
+                        newHistory.push(annotationText);
+                    }
+                    return newHistory;
+                });
             } else {
                 setCurrentAnnotation("(Waiting for video to start...)");
             }
@@ -49,6 +79,7 @@ function App() {
     const [playDetectionVideo, setPlayDetectionVideo] = useState(false);
 
     const [frameAnnotations, setFrameAnnotations] = useState([]); // EDIT HERE 2
+    const [annotationsHistory, setAnnotationsHistory] = useState([]); // EDIT HERE 3
 
 
     useEffect(() => {
@@ -272,9 +303,18 @@ function App() {
                     <h3>TAD Analysis</h3>
                     <p>Results from the ML model will appear here</p>
                     {currentAnnotation && (
-                  <div className="annotation-box">
-                    {currentAnnotation}
-                  </div>
+                      <div className="annotation-box">
+                          <div className="current-annotation">
+                              {currentAnnotation}
+                          </div>
+                          <div className="annotation-history">
+                              {annotationsHistory.map((annotation, index) => (
+                                <div key={index} className="history-entry">
+                                    {annotation}
+                                </div>
+                              ))}
+                          </div>
+                      </div>
                     )}
                   </div>
                 </div>
