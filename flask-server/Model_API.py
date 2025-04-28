@@ -105,6 +105,7 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
 
     frame_idx = 0
     bg_index = class_names.index("background") if "background" in class_names else None
+    per_frame_labels = [] # EDITED HERE 2
 
     while True:
         ret, frame = cap.read()
@@ -118,6 +119,8 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
 
         top_indices = scores.argsort()[-3:][::-1]  # Top 3 confidence indices
         labels_to_show = [(class_names[i], scores[i]) for i in top_indices]
+
+        per_frame_labels.append([label for label, _ in labels_to_show]) # EDIT HERE 2
 
         # Optional: draw semi-transparent background
         overlay = frame.copy()
@@ -140,8 +143,8 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
     out.release()
 
     print(f" Saved annotated video to {output_path}")
-
     print(f" Saved raw annotated video to {output_path}")
+
 
     try: # EDIT HERE START
         fixed_output = output_path.replace('.mp4', '_fixed.mp4')
@@ -154,6 +157,8 @@ def overlay_labels_on_video(video_path, pred_binary, pred_scores, class_names,
         print(f"Re-encoded {output_path} successfully.")
     except Exception as e:
         print(f"ffmpeg compression failed: {e}") # EDIT HERE END
+
+    return per_frame_labels # EDIT HERE 2
 
 def find_best_thresholds_per_class(pred_scores, true_labels, thresholds=np.linspace(0.01, 0.99, 50), verbose=True, class_names=None):
     num_classes = pred_scores.shape[1]
@@ -231,11 +236,21 @@ def end_to_end(video_path, model_path, pickle_path, model_name="MCG-NJU/videomae
 
   binary_preds = make_binary_predictions(scores=pred_scores, decision_type="threshold", thresholds=THRESHOLDS, top_n=3)
 
-  overlay_labels_on_video(
+  '''overlay_labels_on_video(
   video_path=video_path,
   pred_binary=binary_preds,
   pred_scores=pred_scores,
   class_names=labels,
   output_path=outputpath)
 
-  return pred_scores
+  return pred_scores'''
+
+  per_frame_labels = overlay_labels_on_video( # EDIT HERE 2
+      video_path=video_path,
+      pred_binary=binary_preds,
+      pred_scores=pred_scores,
+      class_names=labels,
+      output_path=outputpath
+  )
+
+  return per_frame_labels # EDIT HERE 2

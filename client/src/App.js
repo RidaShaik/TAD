@@ -8,13 +8,36 @@ function App() {
     const videoRef = useRef(null);
     const [currentAnnotation, setCurrentAnnotation] = useState("");
 
-const handleTimeUpdate = () => {
+/*const handleTimeUpdate = () => {
     if (videoRef.current) {
         const currentTimeDec = videoRef.current.currentTime.toFixed(1);
         const currentTimeInt = Math.floor(videoRef.current.currentTime)
         setCurrentAnnotation(`GT[${currentTimeInt}] start:${currentTimeDec}`);
       }
-};
+};*/
+
+    const handleTimeUpdate = () => {
+        if (videoRef.current) {
+            const currentTime = videoRef.current.currentTime;
+            const fps = 30; // If your videos are 30 FPS; adjust if needed
+            const frameIndex = Math.floor(currentTime * fps);
+
+            if (frameIndex >= 0 && frameIndex < frameAnnotations.length) {
+                const labels = frameAnnotations[frameIndex];
+
+                if (labels && labels.length > 0) {
+                    const timestamp = currentTime.toFixed(1); // example: "3.4"
+                    const labelText = labels.join(", ");
+                    setCurrentAnnotation(`Time: ${timestamp}s\nLabels: ${labelText}`);
+                } else {
+                    const timestamp = currentTime.toFixed(1);
+                    setCurrentAnnotation(`Time: ${timestamp}s\n(No action detected)`);
+                }
+            } else {
+                setCurrentAnnotation("(Waiting for video to start...)");
+            }
+        }
+    };
 
     const [videoFile, setVideoFile] = useState(null);
     const [videoURL, setVideoURL] = useState('');
@@ -24,6 +47,8 @@ const handleTimeUpdate = () => {
 
     const [newsArticles, setNewsArticles] = useState([]);
     const [playDetectionVideo, setPlayDetectionVideo] = useState(false);
+
+    const [frameAnnotations, setFrameAnnotations] = useState([]); // EDIT HERE 2
 
 
     useEffect(() => {
@@ -62,7 +87,6 @@ const handleTimeUpdate = () => {
             console.error("Error fetching SportsNews", error);
         }
     }
-
 
     const handleVideoUpload = async (event) => {
         const file = event.target.files[0];
@@ -115,7 +139,16 @@ const handleTimeUpdate = () => {
             if (response.ok) {
                 const result = await response.json();
                 const annotatedName = result.outputvideo || `annotated${filename}`;
-            setVideoURL(`/videos/${annotatedName}`);
+                setVideoURL(`/videos/${annotatedName}`);
+
+                if (result.frame_labels) { // EDIT HERE 2 BEGIN
+                    setFrameAnnotations(result.frame_labels);
+                }
+                if (result.frame_labels) {
+                    console.log("Frame Annotations received:", result.frame_labels);
+                    setFrameAnnotations(result.frame_labels);
+                } // EDIT HERE END
+
             } else {
                 console.error("Inference failed");
             }

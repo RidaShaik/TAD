@@ -96,7 +96,7 @@ def run_inference():
     output_path = os.path.join(app.config['UPLOAD_FOLDER'], "annotated" + video_name)
 
     try:
-        end_to_end(
+        frame_labels = end_to_end( # EDIT HERE 2
             video_path=video_path,
             model_path=model_path,
             pickle_path=pickle_path,
@@ -107,7 +107,8 @@ def run_inference():
 
     return jsonify({
         "message": "Inference complete.",
-        "outputvideo": "annotated" + video_name
+        "outputvideo": "annotated" + video_name,
+        "frame_labels": frame_labels  # EDIT HERE 2
     })
 
 if __name__ == "__main__":
